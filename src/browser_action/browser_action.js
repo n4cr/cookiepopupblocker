@@ -78,9 +78,8 @@ console.log('loaded')
 addListeners()
 showCount();
 
-chrome.storage.sync.set({subscribed: false})
-
 chrome.storage.sync.get(['subscribed', 'setupDate'], result => {
+    console.log(result)
     if (!result.subscribed) {
         const signup = document.getElementById('signup')
         show(signup)

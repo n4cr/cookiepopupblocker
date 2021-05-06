@@ -1,17 +1,6 @@
 const skipNodes = []
 let sucessDone = false;
 
-//
-// function checkLicense() {
-//     const input = document.getElementById('licenseInput')
-//     const key = input.value;
-//     const data = new FormData({})
-//     fetch('https://api.gumroad.com/v2/licenses/verify', {
-//         method: 'POST',
-//         body: data
-//     })
-// }
-//
 function treatAsUTC(date) {
     const result = new Date(date);
     result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
@@ -124,10 +113,8 @@ function processNode(node) {
                 const days = daysBetween(setupDate, new Date())
                 const daysLeft = days < 7 ? 7 - days : 0;
 
-                const signup = document.getElementById('signup')
                 if (result.subscribed) {
                     removePopup(node)
-                    hide(signup)
                 } else {
                     if (daysLeft > 0) {
                         // Trial period
@@ -136,7 +123,6 @@ function processNode(node) {
                     } else {
                         injectHelperLink(node)
                     }
-                    show(signup)
                 }
             })
 
