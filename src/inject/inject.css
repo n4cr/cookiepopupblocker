@@ -1,0 +1,37 @@
+
+.popupblockersuccess {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 180px;
+    color: #AAAAAA;
+    padding: 3px;
+    text-align: center;
+    z-index: 10000;
+    background-color: #EEEEEE;
+    animation: fade 3s ease-in-out;
+    opacity: 0;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    border: 1px solid red;
+}
+
+.helperlink {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    background-color: white;
+    color: black;
+    padding: 1px;
+}
+
+@keyframes fade {
+    0%, 100% {
+        opacity: 0
+    }
+    50% {
+        opacity: 1
+    }
+}

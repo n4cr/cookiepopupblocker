@@ -1,0 +1,44 @@
+{
+  "name": "Cookie Popup Blocker",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "description": "Get rid of annoying cookie popups without agreeing to the terms",
+  "homepage_url": "http://cookiepopupblocker.com",
+  "icons": {
+    "16": "icons/cookie16.png",
+    "48": "icons/cookie48.png",
+    "128": "icons/cookie128.png"
+  },
+  "default_locale": "en",
+  "background": {
+    "scripts": [
+      "src/bg/background.js"
+    ],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_icon": "icons/cookie48.png",
+    "default_title": "Cookie Popup Blocker",
+    "default_popup": "src/browser_action/browser_action.html"
+  },
+  "permissions": [
+    "tabs",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*/*",
+        "http://*/*"
+      ],
+      "js": [
+        "src/inject/inject.js"
+      ],
+      "css": [
+        "src/inject/inject.css"
+      ],
+
+      "run_at": "document_end"
+    }
+  ]
+}
