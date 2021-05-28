@@ -42,13 +42,6 @@ function isFixed(node) {
     return ["fixed", "sticky"].includes(getComputedStyle(node).position)
 }
 
-function isOverlay(node) {
-    const computed = getComputedStyle(node)
-    const height = node.offsetHeight
-    const width = node.offsetWidth
-    const perhapsOverlay = height > window.innerHeight * 0.7 && width > window.innerWidth * 0.7
-    return computed.zIndex >= 5000 && perhapsOverlay
-}
 
 function processScroll() {
     if (document.body == null) {
@@ -86,12 +79,12 @@ function success() {
 
 function removePopup(node) {
 
-    // Go ahead
     node.remove()
     processScroll();
     success();
     increment()
 }
+
 
 function injectHelperLink(node) {
     const link = document.createElement('a');
@@ -102,32 +95,50 @@ function injectHelperLink(node) {
     node.appendChild(link)
 }
 
+function checkSubAndRemove(node) {
+    chrome.storage.sync.get(['subscribed', 'setupDate'], result => {
+        const setupDate = result.setupDate ? new Date(result.setupDate) : new Date()
+        const days = daysBetween(setupDate, new Date())
+        const daysLeft = days < 7 ? 7 - days : 0;
+
+        if (result.subscribed) {
+            removePopup(node)
+        } else {
+            if (daysLeft > 0) {
+                // Trial period
+                removePopup(node)
+
+            } else {
+                injectHelperLink(node)
+            }
+        }
+    })
+
+}
+
+function isCookieNotice(node) {
+    const attrs = [
+        node.id,
+        node.className,
+        node.getAttribute('aria-label')
+    ]
+    return attrs.some(attr => /(cookie|gdpr|consent|privacy|opt-in)/i.test(node.innerHTML))
+}
+
 function processNode(node) {
 
-    if (isFixed(node)) {
-        const text = node.innerHTML.toLowerCase()
-        if (isOverlay(node) || text.includes('cookie') || text.includes('consent') || text.includes('gdpr')) {
-            // Check the user is subscribed and trial expired
-            chrome.storage.sync.get(['subscribed', 'setupDate'], result => {
-                const setupDate = result.setupDate ? new Date(result.setupDate) : new Date()
-                const days = daysBetween(setupDate, new Date())
-                const daysLeft = days < 7 ? 7 - days : 0;
-
-                if (result.subscribed) {
-                    removePopup(node)
-                } else {
-                    if (daysLeft > 0) {
-                        // Trial period
-                        removePopup(node)
-
-                    } else {
-                        injectHelperLink(node)
-                    }
-                }
-            })
-
-
+    if (isCookieNotice(node)) {
+        if (isFixed(node)) {
+            checkSubAndRemove(node)
+            return
         }
+        for (const child of node.children) {
+            if (isFixed(child)) {
+                child.remove()
+                return
+            }
+        }
+
     }
 }
 
@@ -142,7 +153,7 @@ const config = {attributes: true, childList: true, subtree: true};
 // Callback function to execute when mutations are observed
 const tags = ["FORM", "DIV", "SECTION", "ARTICLE", "BODY"]
 const callback = function (mutationsList, observer) {
-
+    console.log('mutatio')
     for (let mutation of mutationsList) {
         if (mutation.addedNodes != null && mutation.addedNodes.length != 0) {
             for (const node of mutation.addedNodes) {

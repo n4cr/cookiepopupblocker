@@ -22,7 +22,6 @@
     "default_popup": "src/browser_action/browser_action.html"
   },
   "permissions": [
-    "tabs",
     "storage"
   ],
   "content_scripts": [
