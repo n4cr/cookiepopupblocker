@@ -19,51 +19,6 @@ function show(element) {
     element.classList.remove('hidden')
 }
 
-function signedUp() {
-    const signup = document.getElementById('signup')
-    hide(signup)
-    const signUpSuccess = document.getElementById('signUpSuccess')
-    show(signUpSuccess)
-}
-
-function registerFailed() {
-
-    const err = document.getElementById('registerError')
-    show(err)
-}
-
-function addListeners() {
-    const checkLicenseButton = document.getElementById('checkLicenseButton')
-    console.log(checkLicenseButton);
-    checkLicenseButton.addEventListener('click', () => {
-        const err = document.getElementById('registerError')
-        hide(err)
-
-        const input = document.getElementById('licenseInput')
-        const key = input.value;
-        const data = new URLSearchParams({
-            'product_permalink': 'cookie-popup-blocker',
-            'license_key': key,
-            'increment_uses_count': false
-        })
-        fetch('https://api.gumroad.com/v2/licenses/verify', {
-            method: 'POST',
-            body: data
-        }).then(resp => resp.json()).then(result => {
-            console.log(result)
-            if (result.success) {
-                chrome.storage.sync.set({subscribed: true})
-                signedUp()
-                console.log('Subscribtion Successful')
-            } else {
-                registerFailed()
-            }
-        }).catch(error => {
-            registerFailed()
-        })
-
-    })
-}
 
 function showCount() {
     const countEl = document.getElementById('count')
@@ -73,22 +28,52 @@ function showCount() {
     });
 }
 
-console.log('loaded')
 
-addListeners()
+async function prepareButtons() {
+    const button = document.getElementById('excludeButton')
+
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+        const hostnameRegex = /\/\/([\.\-\_\w]+)/i
+        const activeTab = tabs[0];
+        const hostname = activeTab.url.match(hostnameRegex)[1]
+
+
+        chrome.storage.sync.get(hostname, res => {
+            if (res[hostname] === 'skip') {
+                button.classList.remove('button')
+                button.classList.add('buttonInclude')
+            } else {
+                button.classList.add('button')
+                button.classList.remove('buttonInclude')
+            }
+        });
+    });
+
+
+    button.addEventListener('click', (event) => {
+        chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+            const hostnameRegex = /\/\/([\.\-\_\w]+)/i
+            const activeTab = tabs[0];
+            const hostname = activeTab.url.match(hostnameRegex)[1]
+
+            chrome.storage.sync.get(hostname, res => {
+                if (res[hostname] !== 'skip') {
+                    chrome.storage.sync.set({[hostname]: 'skip'}, (e) => {
+                        chrome.tabs.reload(tabs[0].id)
+                    })
+
+                } else {
+                    chrome.storage.sync.remove(hostname, (e) => {
+                        chrome.tabs.reload(tabs[0].id)
+                    })
+
+                }
+            })
+            console.log(hostname)
+
+        });
+    })
+}
+
 showCount();
-
-chrome.storage.sync.get(['subscribed', 'setupDate'], result => {
-    console.log(result)
-    if (!result.subscribed) {
-        const signup = document.getElementById('signup')
-        show(signup)
-
-        const setupDate = result.setupDate ? new Date(result.setupDate) : new Date()
-        const days = daysBetween(setupDate, new Date())
-        const daysLeft = days < 7 ? 7 - days : 0;
-        const daysLeftEl = document.getElementById('daysLeft')
-        daysLeftEl.innerText = daysLeft;
-    }
-})
-
+prepareButtons()

@@ -1,6 +1,6 @@
 {
   "name": "Cookie Popup Blocker",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "manifest_version": 2,
   "description": "Get rid of annoying cookie popups without agreeing to the terms",
   "homepage_url": "http://cookiepopupblocker.com",
@@ -22,7 +22,8 @@
     "default_popup": "src/browser_action/browser_action.html"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "activeTab"
   ],
   "content_scripts": [
     {

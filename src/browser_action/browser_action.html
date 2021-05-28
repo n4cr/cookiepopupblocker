@@ -2,7 +2,7 @@
 <style type="text/css">
     #mainPopup {
         padding: 10px;
-        height: 400px;
+        height: 200px;
         width: 300px;
         font-family: Helvetica, Ubuntu, Arial, sans-serif;
     }
@@ -36,19 +36,16 @@
         cursor: pointer;
         text-decoration: none;
     }
-
-    #register {
-        display: flex;
+    .buttonInclude {
+        background: #ffc268;
+        border: 1px solid transparent;
+        color: white;
+        border-radius: 4px;
+        padding: 4px 20px;
+        cursor: pointer;
+        text-decoration: none;
     }
 
-    #registerError {
-        color: red;
-    }
-
-    #signUpSuccess {
-        padding: 10px;
-        background: lightgreen;
-    }
 
     .hidden {
         display: none;
@@ -61,39 +58,15 @@
 </style>
 
 <div id="mainPopup">
-    <h1>Cookie Popup Blocker</h1>
-    <div id="signup" class="hidden">
-        <div>You have <span id="daysLeft">x</span> days left to the end of your trial.</div>
-        <div id="register">
-            <div>
-                <div>
-                    <input id="licenseInput" type="text" value="" placeholder="Your License Key">
-                </div>
-
-            </div>
-            <button class="button" id="checkLicenseButton" style="margin-left: 10px">Register</button>
-        </div>
-        <div id="registerError" class="hidden">Invalid License Key</div>
-        <hr>
-        <div style="text-align: center">
-            <div style="margin-bottom: 10px">OR</div>
-            <div>
-                <a target="_blank" class="button" href="https://gumroad.com/l/cookie-popup-blocker">Get Your License Key</a>
-                <!--            <script src="https://gumroad.com/js/gumroad.js"></script>-->
-                <!--            <a class="gumroad-button" href="https://gumroad.com/l/EIhUj?wanted=true" target="_blank">Get Your License-->
-                <!--                Key</a>-->
-            </div>
-        </div>
-    </div>
-    <div id="signUpSuccess" class="hidden">
-        Success! Let's kill some cookie popups!
+    <h1 style="text-align: center">Cookie Popup Blocker</h1>
+    <div style="text-align: center">
+        <button id="excludeButton" class="button">Exclude This Website</button>
     </div>
     <div style="text-align: center; margin-top: 10px">
         <div id="count">
             0
         </div>
         <div style="font-size: 18px; margin-top: 10px">Cookie Popups Blocked</div>
-
     </div>
 </div>
 <script src="browser_action.js"></script>

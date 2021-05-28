@@ -27,16 +27,6 @@ function increment() {
 
 }
 
-function initialise() {
-    chrome.storage.sync.get('setupDate', function (result) {
-        if (!result.setupDate) {
-            const date = new Date().toISOString()
-            chrome.storage.sync.set({setupDate: date}, function () {
-            });
-        }
-        console.log(new Date(result.setupDate))
-    });
-}
 
 function isFixed(node) {
     return ["fixed", "sticky"].includes(getComputedStyle(node).position)
@@ -50,11 +40,6 @@ function processScroll() {
     document.body.style.setProperty("overflow", "visible", "important");
     document.documentElement.style.setProperty("overflow", "visible", "important");
 
-    // node.style["overflow"] = "visible !important";
-    // node.style["overflow-x"] = "visible";
-    // node.style["overflow-y"] = "visible"
-    // node.style["position"] = "static !important"
-    //
 }
 
 function success() {
@@ -86,36 +71,6 @@ function removePopup(node) {
 }
 
 
-function injectHelperLink(node) {
-    const link = document.createElement('a');
-    link.target = '_blank'
-    link.href = 'https://gumroad.com/l/cookie-popup-blocker'
-    link.innerText = 'Get rid of Cookie Popups'
-    link.classList.add('helperlink')
-    node.appendChild(link)
-}
-
-function checkSubAndRemove(node) {
-    chrome.storage.sync.get(['subscribed', 'setupDate'], result => {
-        const setupDate = result.setupDate ? new Date(result.setupDate) : new Date()
-        const days = daysBetween(setupDate, new Date())
-        const daysLeft = days < 7 ? 7 - days : 0;
-
-        if (result.subscribed) {
-            removePopup(node)
-        } else {
-            if (daysLeft > 0) {
-                // Trial period
-                removePopup(node)
-
-            } else {
-                injectHelperLink(node)
-            }
-        }
-    })
-
-}
-
 function isCookieNotice(node) {
     const attrs = [
         node.id,
@@ -126,10 +81,9 @@ function isCookieNotice(node) {
 }
 
 function processNode(node) {
-
     if (isCookieNotice(node)) {
         if (isFixed(node)) {
-            checkSubAndRemove(node)
+            removePopup(node)
             return
         }
         for (const child of node.children) {
@@ -140,11 +94,9 @@ function processNode(node) {
         }
 
     }
-}
 
-document.querySelectorAll("form, div, section, article").forEach(function (node) {
-    processNode(node)
-});
+
+}
 
 // Observe page
 const node = document.getElementsByTagName('body')[0]
@@ -175,10 +127,24 @@ const callback = function (mutationsList, observer) {
     }
 
 }
-const observer = new MutationObserver(callback);
+
+const url = window.location.href;
+const hostnameRegex = /\/\/([\.\-\_\w]+)/i
+const hostname = url.match(hostnameRegex)[1]
+console.log(hostname)
+
+// Skip if it was requested
+chrome.storage.sync.get(hostname, res => {
+    if (res[hostname] !== 'skip') {
+        document.querySelectorAll("form, div, section, article").forEach(function (node) {
+            processNode(node)
+        });
+
+        const observer = new MutationObserver(callback);
 
 // Start observing the target node for configured mutations
-observer.observe(node, config);
+        observer.observe(node, config);
+    }
+})
 
-initialise()
-processScroll()
+
