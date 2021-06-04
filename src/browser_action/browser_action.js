@@ -42,9 +42,11 @@ async function prepareButtons() {
             if (res[hostname] === 'skip') {
                 button.classList.remove('button')
                 button.classList.add('buttonInclude')
+                button.innerText = 'Include this website'
             } else {
                 button.classList.add('button')
                 button.classList.remove('buttonInclude')
+                button.innerText = 'Exclude this website'
             }
         });
     });
