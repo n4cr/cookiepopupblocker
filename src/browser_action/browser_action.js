@@ -71,7 +71,6 @@ async function prepareButtons() {
 
                 }
             })
-            console.log(hostname)
 
         });
     })

@@ -105,7 +105,6 @@ const config = {attributes: true, childList: true, subtree: true};
 // Callback function to execute when mutations are observed
 const tags = ["FORM", "DIV", "SECTION", "ARTICLE", "BODY"]
 const callback = function (mutationsList, observer) {
-    console.log('mutatio')
     for (let mutation of mutationsList) {
         if (mutation.addedNodes != null && mutation.addedNodes.length != 0) {
             for (const node of mutation.addedNodes) {
@@ -131,7 +130,6 @@ const callback = function (mutationsList, observer) {
 const url = window.location.href;
 const hostnameRegex = /\/\/([\.\-\_\w]+)/i
 const hostname = url.match(hostnameRegex)[1]
-console.log(hostname)
 
 // Skip if it was requested
 chrome.storage.sync.get(hostname, res => {
